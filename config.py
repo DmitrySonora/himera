@@ -11,7 +11,7 @@ TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "7404854015:AAEyJwp5vCtIgRRpQlxpfBT
 DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "sk-8e6d7a7e7acf4202b013251e1ebc2d2a")
 
 # DeepSeek Endpoint
-DEEPSEEK_API_URL = os.getenv("DEEPSEEK_API_URL", "https://api.deepseek.com/v1/chat/completions")
+DEEPSEEK_API_URL = os.getenv("DEEPSEEK_API_URL", "https://api.deepseek.com")
 
 # Текст системного контекста и кодекса стиля
 # Здесь должна быть ваша строка с контекстом (добавьте свою версию)
