@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "Это литературный бот 'Балканская химера'. Отправьте свой вопрос или реплику."
+        "Привет, я Химера!"
     )
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
