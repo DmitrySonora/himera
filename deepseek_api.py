@@ -8,6 +8,7 @@ from config import (
     SYSTEM_PROMPT_EXPERT,
     SYSTEM_PROMPT_LIGHT,
     SYSTEM_PROMPT_FLIRT,
+    SYSTEM_PROMPT_ERO,
     DEEPSEEK_MODEL,
     # Параметры по умолчанию (auto)
     TEMPERATURE,
@@ -33,6 +34,12 @@ from config import (
     TOP_P_FLIRT,
     FREQUENCY_PENALTY_FLIRT,
     PRESENCE_PENALTY_FLIRT,
+    # Параметры для ero
+    TEMPERATURE_ERO,
+    MAX_TOKENS_ERO,
+    TOP_P_ERO,
+    FREQUENCY_PENALTY_ERO,
+    PRESENCE_PENALTY_ERO,
 )
 
 logger = logging.getLogger("deepseek_api")
@@ -66,6 +73,14 @@ def ask_deepseek(user_message, mode="auto"):
         top_p = TOP_P_FLIRT
         frequency_penalty = FREQUENCY_PENALTY_FLIRT
         presence_penalty = PRESENCE_PENALTY_FLIRT
+
+    elif mode == "ero":
+        prompt = SYSTEM_PROMPT_ERO
+        temperature = TEMPERATURE_ERO
+        max_tokens = MAX_TOKENS_ERO
+        top_p = TOP_P_ERO
+        frequency_penalty = FREQUENCY_PENALTY_ERO
+        presence_penalty = PRESENCE_PENALTY_ERO
 
     else:
         prompt = SYSTEM_PROMPT
