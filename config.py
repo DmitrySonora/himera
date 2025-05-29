@@ -32,6 +32,7 @@ SYSTEM_PROMPT = os.getenv("SYSTEM_PROMPT", """
 
 # Настройки DeepSeek
 DEEPSEEK_MODEL = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
+"stream": False
 
 # === Auto (по умолчанию) ===
 TEMPERATURE = 0.75
