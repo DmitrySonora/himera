@@ -66,7 +66,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         add_message(user_id, "user", user_message)
 
         # NEW (memory): Получаем последние 20 сообщений пользователя
-        HISTORY_LIMIT = 50
+        HISTORY_LIMIT = 25
         messages = [{"role": "system", "content": "<ваш системный prompt>"}]
         messages += get_history(user_id, limit=HISTORY_LIMIT)
 
