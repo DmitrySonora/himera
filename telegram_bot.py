@@ -23,7 +23,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
     logger.info(f"Получено сообщение от {user_id}: {user_message[:100]}")
     try:
-        response = ask_deepseek(user_message)
+        response = await ask_deepseek(user_message)
         await update.message.reply_text(response)
     except Exception as e:
         logger.error(f"Ошибка при обработке сообщения: {str(e)}")
