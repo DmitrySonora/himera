@@ -30,22 +30,20 @@ from config import (
 
 logger = logging.getLogger("deepseek_api")
 
-def ask_deepseek(user_message, mode="auto"):
+def ask_deepseek(messages, mode="auto"):
     """
     Отправляет запрос к DeepSeek API и возвращает сгенерированный ответ.
     Поддерживает разные режимы ответа: expert, writer, auto.
     """
 
     if mode == "expert":
-        prompt = SYSTEM_PROMPT_EXPERT
         temperature = TEMPERATURE_EXPERT
         max_tokens = MAX_TOKENS_EXPERT
         top_p = TOP_P_EXPERT
         frequency_penalty = FREQUENCY_PENALTY_EXPERT
         presence_penalty = PRESENCE_PENALTY_EXPERT
-        
+
     elif mode == "writer":
-        prompt = SYSTEM_PROMPT_WRITER
         temperature = TEMPERATURE_WRITER
         max_tokens = MAX_TOKENS_WRITER
         top_p = TOP_P_WRITER
@@ -53,7 +51,6 @@ def ask_deepseek(user_message, mode="auto"):
         presence_penalty = PRESENCE_PENALTY_WRITER
 
     else:
-        prompt = SYSTEM_PROMPT
         temperature = TEMPERATURE
         max_tokens = MAX_TOKENS
         top_p = TOP_P
@@ -62,10 +59,7 @@ def ask_deepseek(user_message, mode="auto"):
 
     payload = {
         "model": DEEPSEEK_MODEL,
-        "messages": [
-            {"role": "system", "content": prompt},
-            {"role": "user", "content": user_message}
-        ],
+        "messages": messages,
         "temperature": temperature,
         "max_tokens": max_tokens,
         "top_p": top_p,
@@ -80,7 +74,8 @@ def ask_deepseek(user_message, mode="auto"):
     }
 
     try:
-        logger.info(f"Запрос к DeepSeek: {user_message[:100]} (режим: {mode})")
+        snippet = str(messages)[:200]  # Для логирования
+        logger.info(f"Запрос к DeepSeek (режим: {mode}): {snippet}")
         response = requests.post(DEEPSEEK_API_URL, headers=headers, json=payload, timeout=60)
         response.raise_for_status()
         data = response.json()
