@@ -6,8 +6,8 @@ from config import (
     DEEPSEEK_API_KEY,
     SYSTEM_PROMPT,
     SYSTEM_PROMPT_EXPERT,
+    SYSTEM_PROMPT_WRITER,
     SYSTEM_PROMPT_LIGHT,
-    SYSTEM_PROMPT_FLIRT,
     DEEPSEEK_MODEL,
     # Параметры по умолчанию (auto)
     TEMPERATURE,
