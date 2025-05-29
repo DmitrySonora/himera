@@ -111,7 +111,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # Используем функцию с двумя system prompt и инъекциями в истории
         messages = build_messages_with_injections(user_id, history_limit=50, step=10)
 
-        response = ask_deepseek(messages, mode=mode)
+        response = ask_deepseek(user_message, mode=mode)
         response = clean_bot_response(response)
         add_message(user_id, "assistant", response)
         await update.message.reply_text(response)
