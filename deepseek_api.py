@@ -24,10 +24,6 @@ def determine_max_tokens(user_message: str) -> int:
         return 400
 
 def ask_deepseek(user_message):
-    """
-    Отправляет запрос к DeepSeek API и возвращает сгенерированный ответ.
-    В случае ошибки возвращает строку с объяснением проблемы.
-    """
     max_tokens = determine_max_tokens(user_message)
 
     payload = {
@@ -60,7 +56,6 @@ def ask_deepseek(user_message):
         response = requests.post(DEEPSEEK_API_URL, headers=headers, json=payload, timeout=60)
         response.raise_for_status()
         data = response.json()
-        # Структура ответа: data['choices'][0]['message']['content']
         if "choices" in data and len(data["choices"]) > 0:
             answer = data["choices"][0]["message"]["content"]
             logger.info(f"Ответ DeepSeek: {answer[:100]}")
