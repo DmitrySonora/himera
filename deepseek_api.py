@@ -4,17 +4,10 @@ import logging
 from config import (
     DEEPSEEK_API_URL,
     DEEPSEEK_API_KEY,
-    SYSTEM_PROMPT,
     SYSTEM_PROMPT_EXPERT,
     SYSTEM_PROMPT_WRITER,
     SYSTEM_PROMPT_LIGHT,
     DEEPSEEK_MODEL,
-    # Параметры по умолчанию (auto)
-    TEMPERATURE,
-    MAX_TOKENS,
-    TOP_P,
-    FREQUENCY_PENALTY,
-    PRESENCE_PENALTY,
     # Параметры для expert
     TEMPERATURE_EXPERT,
     MAX_TOKENS_EXPERT,
@@ -37,7 +30,7 @@ from config import (
 
 logger = logging.getLogger("deepseek_api")
 
-def ask_deepseek(messages, mode="auto"):
+def ask_deepseek(messages, mode="light"):
     """
     messages — список dict-ов [{'role': ..., 'content': ...}, ...]
     """
@@ -58,21 +51,13 @@ def ask_deepseek(messages, mode="auto"):
         frequency_penalty = FREQUENCY_PENALTY_WRITER
         presence_penalty = PRESENCE_PENALTY_WRITER
 
-    elif mode == "light":
+    else mode == "light":
         prompt = SYSTEM_PROMPT_LIGHT
         temperature = TEMPERATURE_LIGHT
         max_tokens = MAX_TOKENS_LIGHT
         top_p = TOP_P_LIGHT
         frequency_penalty = FREQUENCY_PENALTY_LIGHT
         presence_penalty = PRESENCE_PENALTY_LIGHT
-
-    else:
-        prompt = SYSTEM_PROMPT
-        temperature = TEMPERATURE
-        max_tokens = MAX_TOKENS
-        top_p = TOP_P
-        frequency_penalty = FREQUENCY_PENALTY
-        presence_penalty = PRESENCE_PENALTY
 
     # Если в messages уже есть system-промпт, не дублируем
     if not (messages and messages[0].get("role") == "system"):
