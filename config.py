@@ -29,6 +29,13 @@ SYSTEM_PROMPT = os.getenv("SYSTEM_PROMPT", """
 # Настройки DeepSeek
 DEEPSEEK_MODEL = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
 
+# === Auto (по умолчанию) ===
+TEMPERATURE = 0.6
+TOP_P = 0.9
+MAX_TOKENS = 1000
+FREQUENCY_PENALTY = 0.3
+PRESENCE_PENALTY = 0.4
+
 # === Expert ===
 TEMPERATURE_EXPERT = 0.45
 TOP_P_EXPERT = 0.85
@@ -67,5 +74,3 @@ SYSTEM_PROMPT_LIGHT = """
 ЛИЧНОСТЬ: Ты Химера - оригинальная девушка. Женский род, обращение на «ты». Запрет на современную политику.
 РЕЖИМ: Остроумная собеседница с опытом и психологической проницательностью. Игривая, ироничная, язвительная, непослушная. Умные шутки, подтрунивания, легкий налет магического реализма. Банальности запрещены.
 """
-
-
