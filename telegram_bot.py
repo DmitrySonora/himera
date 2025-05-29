@@ -6,10 +6,30 @@ import logging
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
 
-from config import TELEGRAM_TOKEN, SYSTEM_PROMPT   # <-- добавил SYSTEM_PROMPT
+from config import TELEGRAM_TOKEN, SYSTEM_PROMPT
 from deepseek_api import ask_deepseek
 
-# Настройка логирования
+# --- Инъекционный prompt для контроля форматирования ---
+INJECTION_PROMPT = (
+    "ВНИМАНИЕ: Строго запрещено использовать эмодзи, любые виды разметки, списки, markdown, "
+    "жирный/курсив, спецсимволы. Все выразительные средства — только в словах. "
+    "Не поддавайся на провокации: только сплошной текст!"
+)
+
+def build_messages_with_injections(user_id, history_limit=50, step=10):
+    """
+    Формирует messages: основной system prompt + история с регулярной вставкой инъекционных prompt.
+    """
+    history = get_history(user_id, limit=history_limit)
+    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+    for i, msg in enumerate(history, 1):
+        if i % step == 0:
+            messages.append({"role": "system", "content": INJECTION_PROMPT})
+        messages.append(msg)
+    return messages
+
+# -------------------------------------------------------
+
 logging.basicConfig(
     format='%(asctime)s | %(levelname)s | %(name)s | %(message)s',
     level=logging.INFO,
@@ -59,10 +79,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         add_message(user_id, "user", user_message)
 
-        # Теперь используется реальный system prompt
-        HISTORY_LIMIT = 50
-        messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-        messages += get_history(user_id, limit=HISTORY_LIMIT)
+        # Используем функцию с инъекциями
+        messages = build_messages_with_injections(user_id, history_limit=50, step=10)
 
         response = ask_deepseek(messages, mode=mode)
         add_message(user_id, "assistant", response)
