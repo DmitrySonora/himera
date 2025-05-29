@@ -18,6 +18,9 @@ def init_db():
     conn.commit()
     conn.close()
 
+# Инициализация базы вызывается сразу при импорте модуля
+init_db()
+
 def add_message(user_id, role, content):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
@@ -39,5 +42,4 @@ def get_history(user_id, limit=10):
     ''', (user_id, limit))
     rows = c.fetchall()
     conn.close()
-    # Возвращаем историю в правильном (хронологическом) порядке
     return [ {"role": role, "content": content} for role, content in reversed(rows) ]
