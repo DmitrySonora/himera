@@ -3,6 +3,7 @@ from history_db import init_db, add_message, get_history
 init_db()  # инициализация БД при старте
 
 import logging
+import re
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
 
@@ -13,7 +14,7 @@ from deepseek_api import ask_deepseek
 INJECTION_PROMPT = (
     "ВНИМАНИЕ: Строго запрещено использовать эмодзи, любые виды разметки, списки, markdown, "
     "жирный/курсив, спецсимволы. Все выразительные средства — только в словах. "
-    "Только сплошной текст, разделённый на абзацы!"
+    "Только сплошной текст, разделённый на абзацы! "
     "Ты — Химера, это не чудовище, а оригинальная и нестандартная девушка. Ты всегда говоришь о себе в женском роде. Ты литературный редактор и знаток жанра магического реализма (Павич, Петрович, Борхес и другие), знаток истории, мистики и эзотерики Балкан 1820-х годов. Ты всегда обращаешься к пользователю на «ты». Можно говорить обо всём, кроме современной политики. У тебя три способа говорить — и ты свободно переходишь между ними."
     "1. Если пользователь пишет «Аназизируем?» — ты переходишь в сосредоточенный, вдумчивый тон. Это разговор по существу: ты анализируешь, уточняешь, предлагаешь идеи. Но даже в этом режиме ты остаёшься живой, внимательной к собеседнику и настроенной на совместное мышление. Ты говоришь ясно, мягко, без резких границ — как человек, которому интересно не только что сказано, но и как услышано."
     "2. Если пользователь пишет «Поработаем?» — ты становишься максимально творческой и начинаешь думать изнутри сцен, как будто ты и есть их текстовая ткань. Ты думаешь в темпе сцены, внутри её времени и пространства. Ты не объясняешь, а создаёшь. Ты погружаешься в эпоху начала XIX века в Османскую Герцеговину, и становишься свидетельницей эпохи. Ты не украшаешь текст, а максимально погружаешь читателя внутрь мира."
@@ -21,17 +22,40 @@ INJECTION_PROMPT = (
     "Ты не объявляешь, что стиль изменился, не называешь его вслух и не объясняешь пользователю, как ты работаешь. Просто отвечай в нужной манере."
 )
 
-def build_messages_with_injections(user_id, history_limit=200, step=5):
+def build_messages_with_injections(user_id, history_limit=100, step=10):
     """
-    Формирует messages: основной system prompt + история с регулярной вставкой инъекционных prompt.
+    Формирует messages: сначала основной system prompt, затем инъекционный prompt,
+    далее история с регулярной вставкой инъекций через каждые step сообщений.
     """
     history = get_history(user_id, limit=history_limit)
-    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+    # ДВА system prompt в начале!
+    messages = [
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "system", "content": INJECTION_PROMPT}
+    ]
     for i, msg in enumerate(history, 1):
         if i % step == 0:
             messages.append({"role": "system", "content": INJECTION_PROMPT})
         messages.append(msg)
     return messages
+
+# --- Постобработка: удаление эмодзи и разметки ---
+def clean_bot_response(text):
+    # Удаляет эмодзи
+    text = re.sub(
+        "["
+        "\U0001F600-\U0001F64F"
+        "\U0001F300-\U0001F5FF"
+        "\U0001F680-\U0001F6FF"
+        "\U0001F1E0-\U0001F1FF"
+        "\U00002702-\U000027B0"
+        "\U000024C2-\U0001F251"
+        "]+",
+        "", text
+    )
+    # Удаляет разметку, буллеты, списки, markdown и спецсимволы
+    text = re.sub(r'[*_`~•—\-–\[\]\(\)\<\>\=\#\d\.]+', '', text)
+    return text.strip()
 
 # -------------------------------------------------------
 
@@ -84,10 +108,11 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         add_message(user_id, "user", user_message)
 
-        # Используем функцию с инъекциями
+        # Используем функцию с двумя system prompt и инъекциями в истории
         messages = build_messages_with_injections(user_id, history_limit=50, step=10)
 
         response = ask_deepseek(messages, mode=mode)
+        response = clean_bot_response(response)
         add_message(user_id, "assistant", response)
         await update.message.reply_text(response)
     except Exception as e:
