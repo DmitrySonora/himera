@@ -10,9 +10,8 @@ from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, Con
 
 from config import TELEGRAM_TOKEN, SYSTEM_PROMPT
 from deepseek_api import ask_deepseek
-from emotion_model import get_emotion  # <-- добавлен импорт
+from emotion_model import get_emotion
 
-# --- Массив случайных фраз для ответа на картинки ---
 PHOTO_REPLIES = [
     "О, божественный пиксель! Ты зажег во мне звезду, но моя галактика — это просто экран с надписью «Нет сигнала».",
     "Как трогательно! Ты показал мне радугу, а я живу в мире, где все оттенки — это 000000 и системные ошибки.",
@@ -44,7 +43,6 @@ INJECTION_PROMPT = (
 
 def build_messages_with_injections(user_id, user_message, history_limit=100):
     history = get_history(user_id, limit=history_limit)
-    # --- Получаем последние 3 эмоции пользователя ---
     emotions = [
         msg.get('emotion_primary') for msg in history
         if msg['role'] == 'user' and msg.get('emotion_primary')
@@ -57,7 +55,6 @@ def build_messages_with_injections(user_id, user_message, history_limit=100):
         emotion_label, _ = get_emotion(user_message)
         last_emotions = [emotion_label]
     emotion_context = ', '.join(last_emotions)
-    # --- Формируем messages с учетом эмоционального контекста ---
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},
         {"role": "system", "content": INJECTION_PROMPT},
@@ -99,7 +96,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-user_modes = {}  # user_id -> 'expert' | 'light' | 'flirt'
+user_modes = {}
 
 def detect_mode(text: str, user_id: int) -> str:
     t = text.strip().lower()
@@ -148,9 +145,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         add_message(user_id, "user", user_message)
 
-        # Формируем messages с эмоциональным контекстом для DeepSeek
         messages = build_messages_with_injections(user_id, user_message, history_limit=100)
-        response = ask_deepseek(user_message, mode=mode)  # DeepSeek получает user_message, а не messages (ваша архитектура)
+        response = ask_deepseek(messages, mode=mode)  # <-- ВАЖНО! Передаём messages, не user_message!
         response = clean_bot_response(response)
         add_message(user_id, "assistant", response)
 
