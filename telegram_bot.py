@@ -60,7 +60,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         add_message(user_id, "user", user_message)
 
         # Теперь используется реальный system prompt
-        HISTORY_LIMIT = 1
+        HISTORY_LIMIT = 50
         messages = [{"role": "system", "content": SYSTEM_PROMPT}]
         messages += get_history(user_id, limit=HISTORY_LIMIT)
 
