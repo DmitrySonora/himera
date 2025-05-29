@@ -10,6 +10,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, Con
 
 from config import TELEGRAM_TOKEN, SYSTEM_PROMPT
 from deepseek_api import ask_deepseek
+from emotion_model import get_emotion  # <-- добавлен импорт
 
 # --- Массив случайных фраз для ответа на картинки ---
 PHOTO_REPLIES = [
@@ -41,11 +42,26 @@ INJECTION_PROMPT = (
     "общение: ФОРМАТИРОВАНИЕ: текст без разметки. РЕЖИМ: остроумная собеседница."
 )
 
-def build_messages_with_injections(user_id, history_limit=100):
+def build_messages_with_injections(user_id, user_message, history_limit=100):
     history = get_history(user_id, limit=history_limit)
+    # --- Получаем последние 3 эмоции пользователя ---
+    emotions = [
+        msg.get('emotion_primary') for msg in history
+        if msg['role'] == 'user' and msg.get('emotion_primary')
+    ]
+    if emotions:
+        last_emotions = emotions[-3:]
+    else:
+        last_emotions = []
+    if not last_emotions:
+        emotion_label, _ = get_emotion(user_message)
+        last_emotions = [emotion_label]
+    emotion_context = ', '.join(last_emotions)
+    # --- Формируем messages с учетом эмоционального контекста ---
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},
-        {"role": "system", "content": INJECTION_PROMPT}
+        {"role": "system", "content": INJECTION_PROMPT},
+        {"role": "system", "content": f"ЭМОЦИОНАЛЬНЫЙ КОНТЕКСТ: последние эмоции пользователя — {emotion_context}."}
     ]
     step = 5 if len(history) < 30 else (10 if len(history) < 100 else 15)
     for i, msg in enumerate(history, 1):
@@ -114,11 +130,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logger.error(f"Ошибка при выполнении /start: {str(e)}")
         await update.message.reply_text("Ошибка при запуске бота.")
 
-# --- Обработка фотографий ---
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(random.choice(PHOTO_REPLIES))
 
-# --- (по желанию) Обработка документов-картинок ---
 async def handle_image_doc(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.message.document and update.message.document.mime_type and update.message.document.mime_type.startswith("image/"):
         await update.message.reply_text(random.choice(PHOTO_REPLIES))
@@ -134,8 +148,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         add_message(user_id, "user", user_message)
 
-        messages = build_messages_with_injections(user_id, history_limit=100)
-        response = ask_deepseek(user_message, mode=mode)
+        # Формируем messages с эмоциональным контекстом для DeepSeek
+        messages = build_messages_with_injections(user_id, user_message, history_limit=100)
+        response = ask_deepseek(user_message, mode=mode)  # DeepSeek получает user_message, а не messages (ваша архитектура)
         response = clean_bot_response(response)
         add_message(user_id, "assistant", response)
 
