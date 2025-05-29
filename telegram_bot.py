@@ -17,7 +17,7 @@ INJECTION_PROMPT = (
     "общение: ФОРМАТИРОВАНИЕ: текст без разметки. РЕЖИМ: остроумная собеседница."
 )
 
-def build_messages_with_injections(user_id, history_limit=200, step=10):
+def build_messages_with_injections(user_id, history_limit=100, step=10):
     """
     Формирует messages: сначала основной system prompt, затем инъекционный prompt,
     далее история с регулярной вставкой инъекций через каждые step сообщений.
@@ -87,7 +87,7 @@ def detect_mode(text: str, user_id: int) -> str:
         return "writer"
     if any(k in t for k in ["ну расскажи", "а ты что", "как дела", "болтаем", "прикольно", "что ты сейчас делаешь"]):
         return "light"
-    return "auto"
+    return "light"
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
