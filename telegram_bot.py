@@ -62,8 +62,18 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.info(f"Режим пользователя {user_id}: {mode}")
 
     try:
-        # Если функция ask_deepseek принимает mode, передай его туда:
-        response = ask_deepseek(user_message, mode=mode)
+        # NEW (memory): Сохраняем сообщение пользователя
+        add_message(user_id, "user", user_message)
+
+        # NEW (memory): Получаем последние 20 сообщений пользователя
+        HISTORY_LIMIT = 20
+        messages = [{"role": "system", "content": "<ваш системный prompt>"}]
+        messages += get_history(user_id, limit=HISTORY_LIMIT)
+
+        # NEW (memory): ask_deepseek должен принимать всю историю!
+        response = ask_deepseek(messages, mode=mode)
+        # Сохраняем ответ бота в базу
+        add_message(user_id, "assistant", response)
         await update.message.reply_text(response)
     except Exception as e:
         logger.error(f"Ошибка при обработке сообщения: {str(e)}")
