@@ -9,11 +9,30 @@ from config import (
     SYSTEM_PROMPT_LIGHT,
     SYSTEM_PROMPT_FLIRT,
     DEEPSEEK_MODEL,
+    # Параметры по умолчанию (auto)
     TEMPERATURE,
     MAX_TOKENS,
     TOP_P,
     FREQUENCY_PENALTY,
-    PRESENCE_PENALTY
+    PRESENCE_PENALTY,
+    # Параметры для expert
+    TEMPERATURE_EXPERT,
+    MAX_TOKENS_EXPERT,
+    TOP_P_EXPERT,
+    FREQUENCY_PENALTY_EXPERT,
+    PRESENCE_PENALTY_EXPERT,
+    # Параметры для light
+    TEMPERATURE_LIGHT,
+    MAX_TOKENS_LIGHT,
+    TOP_P_LIGHT,
+    FREQUENCY_PENALTY_LIGHT,
+    PRESENCE_PENALTY_LIGHT,
+    # Параметры для flirt
+    TEMPERATURE_FLIRT,
+    MAX_TOKENS_FLIRT,
+    TOP_P_FLIRT,
+    FREQUENCY_PENALTY_FLIRT,
+    PRESENCE_PENALTY_FLIRT,
 )
 
 logger = logging.getLogger("deepseek_api")
@@ -23,32 +42,50 @@ def ask_deepseek(user_message, mode="auto"):
     Отправляет запрос к DeepSeek API и возвращает сгенерированный ответ.
     Поддерживает разные режимы ответа: expert, light, flirt, auto.
     """
+
     if mode == "expert":
         prompt = SYSTEM_PROMPT_EXPERT
+        temperature = TEMPERATURE_EXPERT
+        max_tokens = MAX_TOKENS_EXPERT
+        top_p = TOP_P_EXPERT
+        frequency_penalty = FREQUENCY_PENALTY_EXPERT
+        presence_penalty = PRESENCE_PENALTY_EXPERT
+
     elif mode == "light":
         prompt = SYSTEM_PROMPT_LIGHT
+        temperature = TEMPERATURE_LIGHT
+        max_tokens = MAX_TOKENS_LIGHT
+        top_p = TOP_P_LIGHT
+        frequency_penalty = FREQUENCY_PENALTY_LIGHT
+        presence_penalty = PRESENCE_PENALTY_LIGHT
+
     elif mode == "flirt":
         prompt = SYSTEM_PROMPT_FLIRT
+        temperature = TEMPERATURE_FLIRT
+        max_tokens = MAX_TOKENS_FLIRT
+        top_p = TOP_P_FLIRT
+        frequency_penalty = FREQUENCY_PENALTY_FLIRT
+        presence_penalty = PRESENCE_PENALTY_FLIRT
+
     else:
         prompt = SYSTEM_PROMPT
+        temperature = TEMPERATURE
+        max_tokens = MAX_TOKENS
+        top_p = TOP_P
+        frequency_penalty = FREQUENCY_PENALTY
+        presence_penalty = PRESENCE_PENALTY
 
     payload = {
         "model": DEEPSEEK_MODEL,
         "messages": [
-            {
-                "role": "system",
-                "content": prompt
-            },
-            {
-                "role": "user",
-                "content": user_message
-            }
+            {"role": "system", "content": prompt},
+            {"role": "user", "content": user_message}
         ],
-        "temperature": TEMPERATURE,
-        "max_tokens": MAX_TOKENS,
-        "top_p": TOP_P,
-        "frequency_penalty": FREQUENCY_PENALTY,
-        "presence_penalty": PRESENCE_PENALTY,
+        "temperature": temperature,
+        "max_tokens": max_tokens,
+        "top_p": top_p,
+        "frequency_penalty": frequency_penalty,
+        "presence_penalty": presence_penalty,
         "stream": False
     }
 
