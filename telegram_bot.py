@@ -87,7 +87,7 @@ def detect_mode(text: str, user_id: int) -> str:
         return "writer"
     if any(k in t for k in ["ну расскажи", "а ты что", "как дела", "болтаем", "прикольно", "что ты сейчас делаешь"]):
         return "light"
-    return "light"
+    return "auto"
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
