@@ -30,11 +30,11 @@ SYSTEM_PROMPT = os.getenv("SYSTEM_PROMPT", """
 DEEPSEEK_MODEL = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
 
 # === Auto (по умолчанию) ===
-TEMPERATURE = 0.6
+TEMPERATURE = 0.85
 TOP_P = 0.9
 MAX_TOKENS = 1000
-FREQUENCY_PENALTY = 0.3
-PRESENCE_PENALTY = 0.4
+FREQUENCY_PENALTY = 0.4
+PRESENCE_PENALTY = 0.5
 
 # === Expert ===
 TEMPERATURE_EXPERT = 0.45
@@ -49,13 +49,6 @@ TOP_P_WRITER = 0.95
 MAX_TOKENS_WRITER = 1500
 FREQUENCY_PENALTY_WRITER = 0.3
 PRESENCE_PENALTY_WRITER = 0.8
-
-# === Light ===
-TEMPERATURE_LIGHT = 0.85
-TOP_P_LIGHT = 0.9
-MAX_TOKENS_LIGHT = 1000
-FREQUENCY_PENALTY_LIGHT = 0.4
-PRESENCE_PENALTY_LIGHT = 0.5
 
 SYSTEM_PROMPT_EXPERT = """
 ФОРМАТИРОВАНИЕ: Только текст без разметки, эмодзи, списков, ремарок. Деление на абзацы при тексте больше 300 токенов.
