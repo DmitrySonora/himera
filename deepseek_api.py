@@ -6,7 +6,6 @@ from config import (
     DEEPSEEK_API_KEY,
     SYSTEM_PROMPT,
     SYSTEM_PROMPT_EXPERT,
-    SYSTEM_PROMPT_LIGHT,
     SYSTEM_PROMPT_WRITER,
     DEEPSEEK_MODEL,
     # Параметры по умолчанию (auto)
@@ -27,12 +26,6 @@ from config import (
     TOP_P_WRITER,
     FREQUENCY_PENALTY_WRITER,
     PRESENCE_PENALTY_WRITER,
-    # Параметры для light
-    TEMPERATURE_LIGHT,
-    MAX_TOKENS_LIGHT,
-    TOP_P_LIGHT,
-    FREQUENCY_PENALTY_LIGHT,
-    PRESENCE_PENALTY_LIGHT,
 )
 
 logger = logging.getLogger("deepseek_api")
@@ -40,7 +33,7 @@ logger = logging.getLogger("deepseek_api")
 def ask_deepseek(user_message, mode="auto"):
     """
     Отправляет запрос к DeepSeek API и возвращает сгенерированный ответ.
-    Поддерживает разные режимы ответа: expert, writer, light, auto.
+    Поддерживает разные режимы ответа: expert, writer, auto.
     """
 
     if mode == "expert":
@@ -58,14 +51,6 @@ def ask_deepseek(user_message, mode="auto"):
         top_p = TOP_P_WRITER
         frequency_penalty = FREQUENCY_PENALTY_WRITER
         presence_penalty = PRESENCE_PENALTY_WRITER
-
-    elif mode == "light":
-        prompt = SYSTEM_PROMPT_LIGHT
-        temperature = TEMPERATURE_LIGHT
-        max_tokens = MAX_TOKENS_LIGHT
-        top_p = TOP_P_LIGHT
-        frequency_penalty = FREQUENCY_PENALTY_LIGHT
-        presence_penalty = PRESENCE_PENALTY_LIGHT
 
     else:
         prompt = SYSTEM_PROMPT
