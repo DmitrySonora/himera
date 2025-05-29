@@ -33,6 +33,13 @@ SYSTEM_PROMPT = os.getenv("SYSTEM_PROMPT", """
 # Настройки DeepSeek
 DEEPSEEK_MODEL = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
 
+# === Auto (по умолчанию) ===
+TEMPERATURE = 0.75
+TOP_P = 0.9
+MAX_TOKENS = 1200
+FREQUENCY_PENALTY = 0.5
+PRESENCE_PENALTY = 0.5
+
 # === Expert ===
 TEMPERATURE_EXPERT = 0.75
 TOP_P_EXPERT = 0.85
