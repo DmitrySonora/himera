@@ -10,33 +10,27 @@ from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, Con
 from config import TELEGRAM_TOKEN, SYSTEM_PROMPT
 from deepseek_api import ask_deepseek
 
-# --- Инъекционный prompt для контроля форматирования ---
 INJECTION_PROMPT = (
     "анализ: ФОРМАТИРОВАНИЕ: текст без разметки. РЕЖИМ: литературный редактор, конкретно и практично."
     "творчество: ФОРМАТИРОВАНИЕ: текст без разметки. РЕЖИМ: думай изнутри сцены, эпоха 1820-х."
     "общение: ФОРМАТИРОВАНИЕ: текст без разметки. РЕЖИМ: остроумная собеседница."
 )
 
-def build_messages_with_injections(user_id, history_limit=100, step=10):
-    """
-    Формирует messages: сначала основной system prompt, затем инъекционный prompt,
-    далее история с регулярной вставкой инъекций через каждые step сообщений.
-    """
+def build_messages_with_injections(user_id, history_limit=100):
     history = get_history(user_id, limit=history_limit)
-    # ДВА system prompt в начале!
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},
         {"role": "system", "content": INJECTION_PROMPT}
     ]
+    # Адаптивный шаг: чаще в начале, реже на длинной истории
+    step = 5 if len(history) < 30 else (10 if len(history) < 100 else 15)
     for i, msg in enumerate(history, 1):
         if i % step == 0:
             messages.append({"role": "system", "content": INJECTION_PROMPT})
         messages.append(msg)
     return messages
 
-# --- Постобработка: удаление эмодзи и разметки ---
 def clean_bot_response(text):
-    import re
     # Удаляет эмодзи
     text = re.sub(
         "["
@@ -49,15 +43,20 @@ def clean_bot_response(text):
         "]+",
         "", text
     )
-    # Заменяет только лишние спецсимволы на пробел, НЕ трогая дефисы и тире
+    # Заменяет спецсимволы на пробел, не трогая дефисы и тире
     text = re.sub(r'[*_`~•\[\]\(\)\<\>\=\#]', ' ', text)
     # Убирает повторяющиеся пробелы
     text = re.sub(r'[ \t]+', ' ', text)
-    # Восстанавливает абзацы (чистит только пробелы вокруг переносов)
+    # Восстанавливает абзацы
     text = re.sub(r' *\n *', '\n', text)
     return text.strip()
 
-# -------------------------------------------------------
+def detect_format_violation(text):
+    """Проверка на явные нарушения форматирования (маркированные списки, markdown, эмодзи и т.д.)."""
+    # При необходимости расширьте регулярку под ваши требования
+    if re.search(r'[*_`~•\[\]\(\)\<\>\=\#]', text):
+        return True
+    return False
 
 logging.basicConfig(
     format='%(asctime)s | %(levelname)s | %(name)s | %(message)s',
@@ -108,12 +107,16 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         add_message(user_id, "user", user_message)
 
-        # Используем функцию с двумя system prompt и инъекциями в истории
-        messages = build_messages_with_injections(user_id, history_limit=100, step=10)
-
+        messages = build_messages_with_injections(user_id, history_limit=100)
         response = ask_deepseek(user_message, mode=mode)
         response = clean_bot_response(response)
         add_message(user_id, "assistant", response)
+
+        # Реактивная инъекция: если нарушен формат — добавляем INJECTION_PROMPT в историю
+        if detect_format_violation(response):
+            logger.warning(f"Формат нарушен: {response[:100]}")
+            add_message(user_id, "system", INJECTION_PROMPT)
+
         await update.message.reply_text(response)
     except Exception as e:
         logger.error(f"Ошибка при обработке сообщения: {str(e)}")
