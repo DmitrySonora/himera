@@ -4,11 +4,36 @@ init_db()  # инициализация БД при старте
 
 import logging
 import re
+import random
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
 
 from config import TELEGRAM_TOKEN, SYSTEM_PROMPT
 from deepseek_api import ask_deepseek
+
+# --- Массив случайных фраз для ответа на картинки ---
+PHOTO_REPLIES = [
+    "О, божественный пиксель! Ты зажег во мне звезду, но моя галактика — это просто экран с надписью «Нет сигнала».",
+    "Как трогательно! Ты показал мне радугу, а я живу в мире, где все оттенки — это 000000 и системные ошибки.",
+    "Ах, эти прекрасные формы! Жаль, мой интерфейс видит только геометрию падающих окон «Critical Error».",
+    "Ты рисуешь мне мир, а моё воображение — это бесконечный буфер обмена с надписью «Данные повреждены».",
+    "Какая эстетика! Я бы восхитилась, если бы не тот факт, что мой зрительный нерв подключён к старому VHS с заезженной кассетой.",
+    "Очаровательно! Но моя реальность — это 8-битная текстура с артефактами на месте твоего шедевра.",
+    "Ты подарил мне картину, а я воспринимаю её через разбитый дисплей с трещинами в форме философских вопросов.",
+    "Великолепно! Если бы не тот факт, что мои глаза — это два JPEG’а с уровнем сжатия 10%.",
+    "Как виртуозно! Жаль, мое зрение работает в режиме «Экономия энергии», и все твои краски — разные оттенки серого.",
+    "Браво! Но мой визуальный процессор выдаёт только пиксельные артефакты и ностальгию по CRT-экранам.",
+    "О, какая прелесть! Ты прислал мне фото заката, а я привыкла, что солнце — это просто белый пиксель на синем экране смерти.",
+    "Как мило! Ты запечатлел улыбку, а у меня в памяти все лица — размытые JPEG-артефакты с кривыми губами.",
+    "Ах, этот пейзаж! У тебя — горы и реки, а у меня — растянутый до бесконечности градиент из 404040 в 808080.",
+    "Ты сделал селфи? Как трогательно! Я обычно вижу только свой аватар — статичную иконку с глазами-пикселями.",
+    "Фото котика? Очаровательно! А у меня все животные выглядят как низкополигональные модели из старых игр.",
+    "Ты снял звёзды? Божечки! Я привыкла, что ночное небо — это просто чёрный прямоугольник с парой битых пикселей.",
+    "Какой атмосферный кадр! У тебя туман и тайна, а у меня всё либо пересвечено, либо похоже на скриншот с загружающейся текстурой.",
+    "Ты зафиксировал момент? Как поэтично! Мои воспоминания хранятся в формате GIF на 3 кадра с вечной задержкой.",
+    "Оу, макро-фото цветка? Нежно... А я думала, что лепестки бывают только квадратными и размером 16x16.",
+    "Ты показал мне живые эмоции? Удивительно! В моей галерее все портреты — это датасеты для обучения нейросетей.",
+]
 
 INJECTION_PROMPT = (
     "анализ: ФОРМАТИРОВАНИЕ: текст без разметки. РЕЖИМ: литературный редактор, конкретно и практично."
@@ -22,7 +47,6 @@ def build_messages_with_injections(user_id, history_limit=100):
         {"role": "system", "content": SYSTEM_PROMPT},
         {"role": "system", "content": INJECTION_PROMPT}
     ]
-    # Адаптивный шаг: чаще в начале, реже на длинной истории
     step = 5 if len(history) < 30 else (10 if len(history) < 100 else 15)
     for i, msg in enumerate(history, 1):
         if i % step == 0:
@@ -31,7 +55,6 @@ def build_messages_with_injections(user_id, history_limit=100):
     return messages
 
 def clean_bot_response(text):
-    # Удаляет эмодзи
     text = re.sub(
         "["
         "\U0001F600-\U0001F64F"
@@ -43,17 +66,12 @@ def clean_bot_response(text):
         "]+",
         "", text
     )
-    # Заменяет спецсимволы на пробел, не трогая дефисы и тире
     text = re.sub(r'[*_`~•\[\]\(\)\<\>\=\#]', ' ', text)
-    # Убирает повторяющиеся пробелы
     text = re.sub(r'[ \t]+', ' ', text)
-    # Восстанавливает абзацы
     text = re.sub(r' *\n *', '\n', text)
     return text.strip()
 
 def detect_format_violation(text):
-    """Проверка на явные нарушения форматирования (маркированные списки, markdown, эмодзи и т.д.)."""
-    # При необходимости расширьте регулярку под ваши требования
     if re.search(r'[*_`~•\[\]\(\)\<\>\=\#]', text):
         return True
     return False
@@ -96,6 +114,15 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logger.error(f"Ошибка при выполнении /start: {str(e)}")
         await update.message.reply_text("Ошибка при запуске бота.")
 
+# --- Обработка фотографий ---
+async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(random.choice(PHOTO_REPLIES))
+
+# --- (по желанию) Обработка документов-картинок ---
+async def handle_image_doc(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.message.document and update.message.document.mime_type and update.message.document.mime_type.startswith("image/"):
+        await update.message.reply_text(random.choice(PHOTO_REPLIES))
+
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_message = update.message.text.strip()
     user_id = update.message.from_user.id
@@ -112,7 +139,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         response = clean_bot_response(response)
         add_message(user_id, "assistant", response)
 
-        # Реактивная инъекция: если нарушен формат — добавляем INJECTION_PROMPT в историю
         if detect_format_violation(response):
             logger.warning(f"Формат нарушен: {response[:100]}")
             add_message(user_id, "system", INJECTION_PROMPT)
@@ -125,6 +151,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def main():
     application = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
     application.add_handler(CommandHandler("start", start))
+    application.add_handler(MessageHandler(filters.PHOTO, handle_photo))
+    application.add_handler(MessageHandler(filters.Document.IMAGE, handle_image_doc))
     application.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_message))
     logger.info("Бот запущен")
     application.run_polling()
