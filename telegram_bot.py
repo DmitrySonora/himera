@@ -10,8 +10,9 @@ from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, Con
 
 from config import TELEGRAM_TOKEN, SYSTEM_PROMPT
 from deepseek_api import ask_deepseek
-from emotion_model import get_emotion
+from emotion_model import get_emotion  # Импорт функции анализа эмоций
 
+# --- Массив случайных фраз для ответа на картинки ---
 PHOTO_REPLIES = [
     "О, божественный пиксель! Ты зажег во мне звезду, но моя галактика — это просто экран с надписью «Нет сигнала».",
     "Как трогательно! Ты показал мне радугу, а я живу в мире, где все оттенки — это 000000 и системные ошибки.",
@@ -50,21 +51,23 @@ def build_messages_with_injections(user_id, user_message, history_limit=100):
     if emotions:
         last_emotions = emotions[-3:]
     else:
-        last_emotions = []
-    if not last_emotions:
         emotion_label, _ = get_emotion(user_message)
         last_emotions = [emotion_label]
     emotion_context = ', '.join(last_emotions)
+
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},
         {"role": "system", "content": INJECTION_PROMPT},
         {"role": "system", "content": f"ЭМОЦИОНАЛЬНЫЙ КОНТЕКСТ: последние эмоции пользователя — {emotion_context}."}
     ]
+
     step = 5 if len(history) < 30 else (10 if len(history) < 100 else 15)
+
     for i, msg in enumerate(history, 1):
         if i % step == 0:
             messages.append({"role": "system", "content": INJECTION_PROMPT})
         messages.append(msg)
+
     return messages
 
 def clean_bot_response(text):
@@ -146,7 +149,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         add_message(user_id, "user", user_message)
 
         messages = build_messages_with_injections(user_id, user_message, history_limit=100)
-        response = ask_deepseek(messages, mode=mode)  # <-- ВАЖНО! Передаём messages, не user_message!
+        response = ask_deepseek(messages, mode=mode)  # Передаём весь список сообщений!
         response = clean_bot_response(response)
         add_message(user_id, "assistant", response)
 
