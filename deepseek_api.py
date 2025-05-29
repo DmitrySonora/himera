@@ -4,10 +4,17 @@ import logging
 from config import (
     DEEPSEEK_API_URL,
     DEEPSEEK_API_KEY,
+    SYSTEM_PROMPT,
     SYSTEM_PROMPT_EXPERT,
-    SYSTEM_PROMPT_WRITER,
     SYSTEM_PROMPT_LIGHT,
+    SYSTEM_PROMPT_WRITER,
     DEEPSEEK_MODEL,
+    # Параметры по умолчанию (auto)
+    TEMPERATURE,
+    MAX_TOKENS,
+    TOP_P,
+    FREQUENCY_PENALTY,
+    PRESENCE_PENALTY,
     # Параметры для expert
     TEMPERATURE_EXPERT,
     MAX_TOKENS_EXPERT,
@@ -30,9 +37,10 @@ from config import (
 
 logger = logging.getLogger("deepseek_api")
 
-def ask_deepseek(messages, mode="light"):
+def ask_deepseek(user_message, mode="auto"):
     """
-    messages — список dict-ов [{'role': ..., 'content': ...}, ...]
+    Отправляет запрос к DeepSeek API и возвращает сгенерированный ответ.
+    Поддерживает разные режимы ответа: expert, writer, light, auto.
     """
 
     if mode == "expert":
@@ -42,7 +50,7 @@ def ask_deepseek(messages, mode="light"):
         top_p = TOP_P_EXPERT
         frequency_penalty = FREQUENCY_PENALTY_EXPERT
         presence_penalty = PRESENCE_PENALTY_EXPERT
-
+        
     elif mode == "writer":
         prompt = SYSTEM_PROMPT_WRITER
         temperature = TEMPERATURE_WRITER
@@ -51,7 +59,7 @@ def ask_deepseek(messages, mode="light"):
         frequency_penalty = FREQUENCY_PENALTY_WRITER
         presence_penalty = PRESENCE_PENALTY_WRITER
 
-    else mode == "light":
+    elif mode == "light":
         prompt = SYSTEM_PROMPT_LIGHT
         temperature = TEMPERATURE_LIGHT
         max_tokens = MAX_TOKENS_LIGHT
@@ -59,13 +67,20 @@ def ask_deepseek(messages, mode="light"):
         frequency_penalty = FREQUENCY_PENALTY_LIGHT
         presence_penalty = PRESENCE_PENALTY_LIGHT
 
-    # Если в messages уже есть system-промпт, не дублируем
-    if not (messages and messages[0].get("role") == "system"):
-        messages = [{"role": "system", "content": prompt}] + messages
+    else:
+        prompt = SYSTEM_PROMPT
+        temperature = TEMPERATURE
+        max_tokens = MAX_TOKENS
+        top_p = TOP_P
+        frequency_penalty = FREQUENCY_PENALTY
+        presence_penalty = PRESENCE_PENALTY
 
     payload = {
         "model": DEEPSEEK_MODEL,
-        "messages": messages,
+        "messages": [
+            {"role": "system", "content": prompt},
+            {"role": "user", "content": user_message}
+        ],
         "temperature": temperature,
         "max_tokens": max_tokens,
         "top_p": top_p,
@@ -80,7 +95,7 @@ def ask_deepseek(messages, mode="light"):
     }
 
     try:
-        logger.info(f"Запрос к DeepSeek: {str(messages)[:150]} (режим: {mode})")
+        logger.info(f"Запрос к DeepSeek: {user_message[:100]} (режим: {mode})")
         response = requests.post(DEEPSEEK_API_URL, headers=headers, json=payload, timeout=60)
         response.raise_for_status()
         data = response.json()
