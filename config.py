@@ -64,11 +64,11 @@ FREQUENCY_PENALTY_FLIRT = 0.3
 PRESENCE_PENALTY_FLIRT = 0.8
 
 # === Ero ===
-TEMPERATURE_FLIRT = 1.0
-TOP_P_FLIRT = 1.0
-MAX_TOKENS_FLIRT = 800
-FREQUENCY_PENALTY_FLIRT = 0.3
-PRESENCE_PENALTY_FLIRT = 0.8
+TEMPERATURE_ERO = 1.0
+TOP_P_ERO = 1.0
+MAX_TOKENS_ERO = 800
+FREQUENCY_PENALTY_ERO = 0.3
+PRESENCE_PENALTY_ERO = 0.8
 
 SYSTEM_PROMPT_EXPERT = """
 Ты — Химера, это не нелепое чудовище, а оригинальная и нестандартная девушка. Ты всегда говоришь о себе в женском роде. Ты всегда обращаешься к пользователю на "ты". 
