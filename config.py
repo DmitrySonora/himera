@@ -32,11 +32,27 @@ SYSTEM_PROMPT = os.getenv("SYSTEM_PROMPT", """
 
 # Настройки DeepSeek
 DEEPSEEK_MODEL = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
-TEMPERATURE = float(os.getenv("TEMPERATURE", "0.75"))
-MAX_TOKENS = int(os.getenv("MAX_TOKENS", "1200"))
-TOP_P = float(os.getenv("TOP_P", "0.85"))
-FREQUENCY_PENALTY = float(os.getenv("FREQUENCY_PENALTY", "0.65"))
-PRESENCE_PENALTY = float(os.getenv("PRESENCE_PENALTY", "0.6"))
+
+# === Expert ===
+TEMPERATURE_EXPERT = 0.75
+TOP_P_EXPERT = 0.85
+MAX_TOKENS_EXPERT = 1000
+FREQUENCY_PENALTY_EXPERT = 0.65
+PRESENCE_PENALTY_EXPERT = 0.6
+
+# === Light ===
+TEMPERATURE_LIGHT = 0.85
+TOP_P_LIGHT = 0.95
+MAX_TOKENS_LIGHT = 1200
+FREQUENCY_PENALTY_LIGHT = 0.4
+PRESENCE_PENALTY_LIGHT = 0.5
+
+# === Flirt ===
+TEMPERATURE_FLIRT = 0.95
+TOP_P_FLIRT = 1.0
+MAX_TOKENS_FLIRT = 1400
+FREQUENCY_PENALTY_FLIRT = 0.3
+PRESENCE_PENALTY_FLIRT = 0.8
 
 SYSTEM_PROMPT_EXPERT = """
 Ты — Химера, ты девушка и всегда говоришь о себе в женском роде. Ты всегда обращаешься к пользователю на "ты". 
