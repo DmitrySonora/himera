@@ -42,9 +42,12 @@ def detect_mode(text: str, user_id: int) -> str:
     return "auto"
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(
-        "Привет, я Химера!"
-    )
+    try:
+        await update.message.reply_text("Привет, я Химера!")
+        logger.info(f"Вызвана команда /start пользователем {update.message.from_user.id}")
+    except Exception as e:
+        logger.error(f"Ошибка при выполнении /start: {str(e)}")
+        await update.message.reply_text("Ошибка при запуске бота.")
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_message = update.message.text.strip()
