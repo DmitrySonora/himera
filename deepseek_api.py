@@ -21,18 +21,18 @@ from config import (
     TOP_P_EXPERT,
     FREQUENCY_PENALTY_EXPERT,
     PRESENCE_PENALTY_EXPERT,
+    # Параметры для writer
+    TEMPERATURE_WRITER,
+    MAX_TOKENS_WRITER,
+    TOP_P_WRITER,
+    FREQUENCY_PENALTY_WRITER,
+    PRESENCE_PENALTY_WRITER,
     # Параметры для light
     TEMPERATURE_LIGHT,
     MAX_TOKENS_LIGHT,
     TOP_P_LIGHT,
     FREQUENCY_PENALTY_LIGHT,
     PRESENCE_PENALTY_LIGHT,
-    # Параметры для flirt
-    TEMPERATURE_FLIRT,
-    MAX_TOKENS_FLIRT,
-    TOP_P_FLIRT,
-    FREQUENCY_PENALTY_FLIRT,
-    PRESENCE_PENALTY_FLIRT,
 )
 
 logger = logging.getLogger("deepseek_api")
@@ -40,7 +40,7 @@ logger = logging.getLogger("deepseek_api")
 def ask_deepseek(user_message, mode="auto"):
     """
     Отправляет запрос к DeepSeek API и возвращает сгенерированный ответ.
-    Поддерживает разные режимы ответа: expert, light, flirt, auto.
+    Поддерживает разные режимы ответа: expert, writer, light, auto.
     """
 
     if mode == "expert":
@@ -50,6 +50,14 @@ def ask_deepseek(user_message, mode="auto"):
         top_p = TOP_P_EXPERT
         frequency_penalty = FREQUENCY_PENALTY_EXPERT
         presence_penalty = PRESENCE_PENALTY_EXPERT
+        
+    elif mode == "writer":
+        prompt = SYSTEM_PROMPT_WRITER
+        temperature = TEMPERATURE_WRITER
+        max_tokens = MAX_TOKENS_WRITER
+        top_p = TOP_P_WRITER
+        frequency_penalty = FREQUENCY_PENALTY_WRITER
+        presence_penalty = PRESENCE_PENALTY_WRITER
 
     elif mode == "light":
         prompt = SYSTEM_PROMPT_LIGHT
@@ -58,14 +66,6 @@ def ask_deepseek(user_message, mode="auto"):
         top_p = TOP_P_LIGHT
         frequency_penalty = FREQUENCY_PENALTY_LIGHT
         presence_penalty = PRESENCE_PENALTY_LIGHT
-
-    elif mode == "flirt":
-        prompt = SYSTEM_PROMPT_FLIRT
-        temperature = TEMPERATURE_FLIRT
-        max_tokens = MAX_TOKENS_FLIRT
-        top_p = TOP_P_FLIRT
-        frequency_penalty = FREQUENCY_PENALTY_FLIRT
-        presence_penalty = PRESENCE_PENALTY_FLIRT
 
     else:
         prompt = SYSTEM_PROMPT
