@@ -1,3 +1,7 @@
+from history_db import init_db, add_message, get_history
+
+init_db()  # инициализация БД при старте
+
 import logging
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
