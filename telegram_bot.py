@@ -19,25 +19,25 @@ user_modes = {}  # user_id -> 'expert' | 'light' | 'flirt'
 def detect_mode(text: str, user_id: int) -> str:
     t = text.strip().lower()
 
-    if t == "поработаем?":
+    if t == "аназизируем?":
         user_modes[user_id] = "expert"
         return "expert"
+    if t == "поработаем?":
+        user_modes[user_id] = "writer"
+        return "writer"
     if t == "поболтаем?":
         user_modes[user_id] = "light"
         return "light"
-    if t == "пофлиртуем?":
-        user_modes[user_id] = "flirt"
-        return "flirt"
 
     if user_id in user_modes:
         return user_modes[user_id]
 
     if any(k in t for k in ["объясни", "разбери", "анализ", "что значит", "толкование", "цитата", "в источниках"]):
         return "expert"
+    if any(k in t for k in ["сцена", "роман", "сюжетный конспект"]):
+        return "writer"
     if any(k in t for k in ["ну расскажи", "а ты что", "как дела", "болтаем", "прикольно", "что ты сейчас делаешь"]):
         return "light"
-    if any(k in t for k in ["а ты меня ждала", "а ты скучала", "ты сегодня красивая", "заласкай", "целую ножки"]):
-        return "flirt"
 
     return "auto"
 
