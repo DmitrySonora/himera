@@ -5,6 +5,9 @@ from config import (
     DEEPSEEK_API_URL,
     DEEPSEEK_API_KEY,
     SYSTEM_PROMPT,
+    SYSTEM_PROMPT_EXPERT,
+    SYSTEM_PROMPT_LIGHT,
+    SYSTEM_PROMPT_FLIRT,
     DEEPSEEK_MODEL,
     TEMPERATURE,
     MAX_TOKENS,
@@ -15,17 +18,26 @@ from config import (
 
 logger = logging.getLogger("deepseek_api")
 
-def ask_deepseek(user_message):
+def ask_deepseek(user_message, mode="auto"):
     """
     Отправляет запрос к DeepSeek API и возвращает сгенерированный ответ.
-    В случае ошибки возвращает строку с объяснением проблемы.
+    Поддерживает разные режимы ответа: expert, light, flirt, auto.
     """
+    if mode == "expert":
+        prompt = SYSTEM_PROMPT_EXPERT
+    elif mode == "light":
+        prompt = SYSTEM_PROMPT_LIGHT
+    elif mode == "flirt":
+        prompt = SYSTEM_PROMPT_FLIRT
+    else:
+        prompt = SYSTEM_PROMPT
+
     payload = {
         "model": DEEPSEEK_MODEL,
         "messages": [
             {
                 "role": "system",
-                "content": SYSTEM_PROMPT
+                "content": prompt
             },
             {
                 "role": "user",
@@ -46,11 +58,10 @@ def ask_deepseek(user_message):
     }
 
     try:
-        logger.info(f"Запрос к DeepSeek: {user_message[:100]}")
+        logger.info(f"Запрос к DeepSeek: {user_message[:100]} (режим: {mode})")
         response = requests.post(DEEPSEEK_API_URL, headers=headers, json=payload, timeout=60)
         response.raise_for_status()
         data = response.json()
-        # Структура ответа: data['choices'][0]['message']['content']
         if "choices" in data and len(data["choices"]) > 0:
             answer = data["choices"][0]["message"]["content"]
             logger.info(f"Ответ DeepSeek: {answer[:100]}")
@@ -67,4 +78,3 @@ def ask_deepseek(user_message):
     except Exception as e:
         logger.error(f"Непредвиденная ошибка DeepSeek API: {str(e)}")
         return "Ошибка: Внутренняя ошибка при обращении к DeepSeek API"
-
