@@ -7,25 +7,19 @@ from config import (
     SYSTEM_PROMPT,
     DEEPSEEK_MODEL,
     TEMPERATURE,
+    MAX_TOKENS,
     TOP_P,
     FREQUENCY_PENALTY,
-    PRESENCE_PENALTY,
+    PRESENCE_PENALTY
 )
 
 logger = logging.getLogger("deepseek_api")
 
-def determine_max_tokens(user_message: str) -> int:
-    length = len(user_message)
-    if length < 50:
-        return 1200
-    elif length < 150:
-        return 800
-    else:
-        return 400
-
 def ask_deepseek(user_message):
-    max_tokens = determine_max_tokens(user_message)
-
+    """
+    Отправляет запрос к DeepSeek API и возвращает сгенерированный ответ.
+    В случае ошибки возвращает строку с объяснением проблемы.
+    """
     payload = {
         "model": DEEPSEEK_MODEL,
         "messages": [
@@ -39,7 +33,7 @@ def ask_deepseek(user_message):
             }
         ],
         "temperature": TEMPERATURE,
-        "max_tokens": max_tokens,
+        "max_tokens": MAX_TOKENS,
         "top_p": TOP_P,
         "frequency_penalty": FREQUENCY_PENALTY,
         "presence_penalty": PRESENCE_PENALTY,
@@ -56,6 +50,7 @@ def ask_deepseek(user_message):
         response = requests.post(DEEPSEEK_API_URL, headers=headers, json=payload, timeout=60)
         response.raise_for_status()
         data = response.json()
+        # Структура ответа: data['choices'][0]['message']['content']
         if "choices" in data and len(data["choices"]) > 0:
             answer = data["choices"][0]["message"]["content"]
             logger.info(f"Ответ DeepSeek: {answer[:100]}")
@@ -72,3 +67,4 @@ def ask_deepseek(user_message):
     except Exception as e:
         logger.error(f"Непредвиденная ошибка DeepSeek API: {str(e)}")
         return "Ошибка: Внутренняя ошибка при обращении к DeepSeek API"
+
