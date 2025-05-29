@@ -77,8 +77,8 @@ def detect_mode(text: str, user_id: int) -> str:
         user_modes[user_id] = "writer"
         return "writer"
     if t == "поболтаем?":
-        user_modes[user_id] = "light"
-        return "light"
+        user_modes[user_id] = "auto"
+        return "auto"
     if user_id in user_modes:
         return user_modes[user_id]
     if any(k in t for k in ["объясни", "разбери", "анализ", "что значит", "толкование", "цитата", "в источниках"]):
@@ -86,7 +86,7 @@ def detect_mode(text: str, user_id: int) -> str:
     if any(k in t for k in ["сцена", "роман", "сюжетный конспект"]):
         return "writer"
     if any(k in t for k in ["ну расскажи", "а ты что", "как дела", "болтаем", "прикольно", "что ты сейчас делаешь"]):
-        return "light"
+        return "auto"
     return "auto"
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
