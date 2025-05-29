@@ -6,7 +6,7 @@ import logging
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
 
-from config import TELEGRAM_TOKEN, SYSTEM_PROMPT  # добавил SYSTEM_PROMPT
+from config import TELEGRAM_TOKEN
 from deepseek_api import ask_deepseek
 
 # Настройка логирования
@@ -17,10 +17,12 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Глобальный словарь пользовательских режимов
 user_modes = {}  # user_id -> 'expert' | 'light' | 'flirt'
 
 def detect_mode(text: str, user_id: int) -> str:
     t = text.strip().lower()
+
     if t == "аназизируем?":
         user_modes[user_id] = "expert"
         return "expert"
@@ -30,14 +32,17 @@ def detect_mode(text: str, user_id: int) -> str:
     if t == "поболтаем?":
         user_modes[user_id] = "light"
         return "light"
+
     if user_id in user_modes:
         return user_modes[user_id]
+
     if any(k in t for k in ["объясни", "разбери", "анализ", "что значит", "толкование", "цитата", "в источниках"]):
         return "expert"
     if any(k in t for k in ["сцена", "роман", "сюжетный конспект"]):
         return "writer"
     if any(k in t for k in ["ну расскажи", "а ты что", "как дела", "болтаем", "прикольно", "что ты сейчас делаешь"]):
         return "light"
+
     return "auto"
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -57,15 +62,17 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.info(f"Режим пользователя {user_id}: {mode}")
 
     try:
+        # NEW (memory): Сохраняем сообщение пользователя
         add_message(user_id, "user", user_message)
 
-        # ВАЖНО: Только prompt и текущее сообщение — история ОТКЛЮЧЕНА!
-        messages = [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": user_message}
-        ]
+        # NEW (memory): Получаем последние 20 сообщений пользователя
+        HISTORY_LIMIT = 50
+        messages = [{"role": "system", "content": "<ваш системный prompt>"}]
+        messages += get_history(user_id, limit=HISTORY_LIMIT)
 
+        # NEW (memory): ask_deepseek должен принимать всю историю!
         response = ask_deepseek(messages, mode=mode)
+        # Сохраняем ответ бота в базу
         add_message(user_id, "assistant", response)
         await update.message.reply_text(response)
     except Exception as e:
@@ -74,8 +81,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 def main():
     application = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
+
     application.add_handler(CommandHandler("start", start))
     application.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_message))
+
     logger.info("Бот запущен")
     application.run_polling()
 
