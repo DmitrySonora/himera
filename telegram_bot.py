@@ -61,7 +61,7 @@ def build_messages_with_injections(user_id, user_message, history_limit=70):
         {"role": "system", "content": f"ЭМОЦИОНАЛЬНЫЙ КОНТЕКСТ: последние эмоции пользователя — {emotion_context}."}
     ]
 
-    step = 5 if len(history) < 30 else (10 if len(history) < 100 else 15)
+    step = 5 if len(history) < 30 else (10 if len(history) < 70 else 15)
 
     for i, msg in enumerate(history, 1):
         if i % step == 0:
@@ -148,7 +148,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         add_message(user_id, "user", user_message)
 
-        messages = build_messages_with_injections(user_id, user_message, history_limit=100)
+        messages = build_messages_with_injections(user_id, user_message, history_limit=70)
         response = ask_deepseek(messages, mode=mode)  # Передаём весь список сообщений!
         response = clean_bot_response(response)
         add_message(user_id, "assistant", response)
