@@ -71,9 +71,29 @@ def build_messages_with_injections(user_id, user_message, history_limit=100):
    return messages
 
 def clean_bot_response(text):
+    # Убираем только эмодзи
+    text = re.sub(
+        "["
+        "\U0001F600-\U0001F64F"
+        "\U0001F300-\U0001F5FF"
+        "\U0001F680-\U0001F6FF"
+        "\U0001F1E0-\U0001F1FF"
+        "\U00002702-\U000027B0"
+        "\U000024C2-\U0001F251"
+        "]+",
+        "", text
+    )
+    
+    # Убираем только самое проблематичное форматирование, но оставляем звездочки
+    text = re.sub(r'[_`~•\[\]\(\)\<\>\=\#]', ' ', text)
+    text = re.sub(r'[ \t]+', ' ', text)
+    text = re.sub(r' *\n *', '\n', text)
     return text.strip()
 
 def detect_format_violation(text):
+    # Проверяем только на самые проблематичные символы
+    if re.search(r'[_`~•\[\]\(\)\<\>\=\#]', text):
+        return True
     return False
 
 logging.basicConfig(
