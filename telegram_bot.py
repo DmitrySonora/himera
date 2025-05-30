@@ -82,15 +82,29 @@ def clean_bot_response(text):
         "]+",
         "", text
     )
-    # Возвращаем * в паттерн
-    text = re.sub(r'[*_`~•\[\]\(\)\<\>\=\#]', ' ', text)
+    
+    # Временно заменяем действия в звездочках на placeholder
+    actions = []
+    def save_action(match):
+        actions.append(match.group(1))
+        return f"__ACTION_{len(actions)-1}__"
+    
+    text = re.sub(r'\*([^*]*)\*', save_action, text)
+    
+    # Убираем остальное форматирование
+    text = re.sub(r'[_`~•\[\]\(\)\<\>\=\#*]', ' ', text)
+    
+    # Возвращаем действия обратно
+    for i, action in enumerate(actions):
+        text = text.replace(f"__ACTION_{i}__", f"*{action}*")
+    
     text = re.sub(r'[ \t]+', ' ', text)
     text = re.sub(r' *\n *', '\n', text)
     return text.strip()
 
 def detect_format_violation(text):
-    # Возвращаем * в проверку
-    if re.search(r'[*_`~•\[\]\(\)\<\>\=\#]', text):
+    # Убираем проверку звездочек, оставляем только остальное
+    if re.search(r'[_`~•\[\]\(\)\<\>\=\#]', text):
         return True
     return False
 
