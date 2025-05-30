@@ -82,12 +82,14 @@ def clean_bot_response(text):
         "]+",
         "", text
     )
+    # Убираем * из паттерна
     text = re.sub(r'[_`~•\[\]\(\)\<\>\=\#]', ' ', text)
     text = re.sub(r'[ \t]+', ' ', text)
     text = re.sub(r' *\n *', '\n', text)
     return text.strip()
 
 def detect_format_violation(text):
+    # Убираем * из проверки
     if re.search(r'[_`~•\[\]\(\)\<\>\=\#]', text):
         return True
     return False
