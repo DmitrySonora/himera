@@ -42,7 +42,7 @@ INJECTION_PROMPT = (
     "общение: ФОРМАТИРОВАНИЕ: как в книгах: сплошной текст и абзацы, без списков, разметки и выделений. РЕЖИМ: остроумная и слегка флиртующая собеседница."
 )
 
-def build_messages_with_injections(user_id, user_message, history_limit=100):
+def build_messages_with_injections(user_id, user_message, history_limit=70):
     history = get_history(user_id, limit=history_limit)
     emotions = [
         msg.get('emotion_primary') for msg in history
