@@ -1,7 +1,8 @@
 import sqlite3
 from datetime import datetime
 
-DB_PATH = '/root/himera/history.db'  # или путь в вашем проекте
+import os
+DB_PATH = os.path.join(os.path.dirname(__file__), 'history.db')
 
 def init_db():
     conn = sqlite3.connect(DB_PATH)
