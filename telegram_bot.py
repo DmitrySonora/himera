@@ -764,6 +764,12 @@ def main():
     application.add_handler(CommandHandler("admin_list_passwords", admin_list_passwords))
     application.add_handler(CommandHandler("admin_stats", admin_stats))
     
+    # ДОБАВЬТЕ ЭТИ СТРОКИ - они отсутствуют в текущем коде:
+    application.add_handler(CommandHandler("admin_deactivate_password", admin_deactivate_password))
+    application.add_handler(CommandHandler("admin_auth_log", admin_auth_log))
+    application.add_handler(CommandHandler("admin_blocked_users", admin_blocked_users))
+    application.add_handler(CommandHandler("admin_unblock_user", admin_unblock_user))
+    
     # Обработчики контента
     application.add_handler(MessageHandler(filters.PHOTO, handle_photo))
     application.add_handler(MessageHandler(filters.Document.IMAGE, handle_image_doc))
