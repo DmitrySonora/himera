@@ -16,7 +16,7 @@ DEEPSEEK_API_URL = os.getenv("DEEPSEEK_API_URL", "https://api.deepseek.com/v1/ch
 # === НАСТРОЙКИ АВТОРИЗАЦИИ ===
 
 # Лимиты и доступ
-DAILY_MESSAGE_LIMIT = int(os.getenv("DAILY_MESSAGE_LIMIT", "40"))
+DAILY_MESSAGE_LIMIT = int(os.getenv("DAILY_MESSAGE_LIMIT", "30"))
 ADMIN_USER_IDS = [502312936]  # ID администраторов
 AUTH_TIMEOUT = int(os.getenv("AUTH_TIMEOUT", "300"))  # Таймаут ожидания пароля (секунды)
 EXPIRY_WARNING_DAYS = int(os.getenv("EXPIRY_WARNING_DAYS", "3"))  # За сколько дней предупреждать об истечении
