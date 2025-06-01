@@ -365,7 +365,7 @@ async def admin_unblock_user(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
 # === ОСНОВНЫЕ ФУНКЦИИ БОТА ===
 
-def build_messages_with_injections(user_id, user_message, history_limit=20):
+def build_messages_with_injections(user_id, user_message, history_limit=15):
     """Построение сообщений с инъекциями (существующая функция)"""
     history = get_history(user_id, limit=history_limit)
     emotions = [
@@ -724,7 +724,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         add_message(user_id, "user", user_message, emotion_label, emotion_confidence)
 
         # Строим контекст для DeepSeek
-        messages = build_messages_with_injections(user_id, user_message, history_limit=20)
+        messages = build_messages_with_injections(user_id, user_message, history_limit=15)
         response = ask_deepseek(messages, mode=mode)
         
         # Проверяем нарушения форматирования
