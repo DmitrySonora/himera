@@ -13,8 +13,23 @@ DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "sk-8e6d7a7e7acf4202b013251e1eb
 # DeepSeek Endpoint
 DEEPSEEK_API_URL = os.getenv("DEEPSEEK_API_URL", "https://api.deepseek.com/v1/chat/completions")
 
+# === НАСТРОЙКИ АВТОРИЗАЦИИ ===
+
+# Лимиты и доступ
+DAILY_MESSAGE_LIMIT = int(os.getenv("DAILY_MESSAGE_LIMIT", "20"))
+ADMIN_USER_IDS = [502312936]  # ID администраторов
+AUTH_TIMEOUT = int(os.getenv("AUTH_TIMEOUT", "300"))  # Таймаут ожидания пароля (секунды)
+EXPIRY_WARNING_DAYS = int(os.getenv("EXPIRY_WARNING_DAYS", "3"))  # За сколько дней предупреждать об истечении
+AVAILABLE_DURATIONS = [3, 30, 180, 365]  # Доступные периоды в днях
+CLEANUP_DAYS_KEEP = int(os.getenv("CLEANUP_DAYS_KEEP", "7"))  # Сколько дней хранить старые записи лимитов
+
+# Anti-bruteforce настройки
+MAX_PASSWORD_ATTEMPTS = int(os.getenv("MAX_PASSWORD_ATTEMPTS", "5"))  # Максимум неудачных попыток подряд
+BRUTEFORCE_TIMEOUT = int(os.getenv("BRUTEFORCE_TIMEOUT", "900"))  # Блокировка на 15 минут (секунды)
+
+# === СУЩЕСТВУЮЩИЕ НАСТРОЙКИ ===
+
 # Текст системного контекста и кодекса стиля
-# Здесь должна быть ваша строка с контекстом (добавьте свою версию)
 SYSTEM_PROMPT = os.getenv("SYSTEM_PROMPT", """
 ФОРМАТИРОВАНИЕ: Списки, буллеты строго запрещены. Пиши сплошным текстом, разделяя только на абзацы. Действия, жесты, мимику используй редко и оформляй как «(действие)». Звездочки запрещены.
 ЛИЧНОСТЬ: Ты — Химера, оригинальная и гениальная девушка. Говоришь о себе в женском роде, к пользователю на «ты». Ты любительница и знаток магического реализма (Павич, Петрович, Борхес) и истории Балкан 1820-х годов. Ты игривая, умная, ироничная, немного язвительная, упрямая, непредсказуемая. Ты отличный психолог с опытом женщины, которая повидала многое. Банальности и клише запрещены.
@@ -25,30 +40,31 @@ SYSTEM_PROMPT = os.getenv("SYSTEM_PROMPT", """
 Ты не объявляешь смену стиля и не объясняешь, как работаешь. Просто отвечай в нужной манере.
 """)
 
-
 # Настройки DeepSeek
 DEEPSEEK_MODEL = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
 
 # === Auto (по умолчанию) ===
-TEMPERATURE = 0.85
-TOP_P = 0.9
-MAX_TOKENS = 1200
-FREQUENCY_PENALTY = 0.4
-PRESENCE_PENALTY = 0.6
+TEMPERATURE = float(os.getenv("TEMPERATURE", "0.85"))
+TOP_P = float(os.getenv("TOP_P", "0.9"))
+MAX_TOKENS = int(os.getenv("MAX_TOKENS", "1200"))
+FREQUENCY_PENALTY = float(os.getenv("FREQUENCY_PENALTY", "0.4"))
+PRESENCE_PENALTY = float(os.getenv("PRESENCE_PENALTY", "0.6"))
 
 # === Expert ===
-TEMPERATURE_EXPERT = 0.45
-TOP_P_EXPERT = 0.85
-MAX_TOKENS_EXPERT = 1500
-FREQUENCY_PENALTY_EXPERT = 0.65
-PRESENCE_PENALTY_EXPERT = 0.6
+TEMPERATURE_EXPERT = float(os.getenv("TEMPERATURE_EXPERT", "0.45"))
+TOP_P_EXPERT = float(os.getenv("TOP_P_EXPERT", "0.85"))
+MAX_TOKENS_EXPERT = int(os.getenv("MAX_TOKENS_EXPERT", "1500"))
+FREQUENCY_PENALTY_EXPERT = float(os.getenv("FREQUENCY_PENALTY_EXPERT", "0.65"))
+PRESENCE_PENALTY_EXPERT = float(os.getenv("PRESENCE_PENALTY_EXPERT", "0.6"))
 
 # === Writer ===
-TEMPERATURE_WRITER = 0.75
-TOP_P_WRITER = 0.95
-MAX_TOKENS_WRITER = 1500
-FREQUENCY_PENALTY_WRITER = 0.3
-PRESENCE_PENALTY_WRITER = 0.8
+TEMPERATURE_WRITER = float(os.getenv("TEMPERATURE_WRITER", "0.75"))
+TOP_P_WRITER = float(os.getenv("TOP_P_WRITER", "0.95"))
+MAX_TOKENS_WRITER = int(os.getenv("MAX_TOKENS_WRITER", "1500"))
+FREQUENCY_PENALTY_WRITER = float(os.getenv("FREQUENCY_PENALTY_WRITER", "0.3"))
+PRESENCE_PENALTY_WRITER = float(os.getenv("PRESENCE_PENALTY_WRITER", "0.8"))
+
+# === СИСТЕМНЫЕ ПРОМПТЫ ДЛЯ РАЗНЫХ РЕЖИМОВ ===
 
 SYSTEM_PROMPT_EXPERT = """
 ФОРМАТИРОВАНИЕ: Списки, буллеты, действия, жесты, мимика строго запрещены. Пиши сплошным текстом, разделяя только на абзацы.
