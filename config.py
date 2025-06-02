@@ -20,7 +20,7 @@ DAILY_MESSAGE_LIMIT = int(os.getenv("DAILY_MESSAGE_LIMIT", "25"))
 ADMIN_USER_IDS = [502312936]  # ID администраторов
 AUTH_TIMEOUT = int(os.getenv("AUTH_TIMEOUT", "300"))  # Таймаут ожидания пароля (секунды)
 EXPIRY_WARNING_DAYS = int(os.getenv("EXPIRY_WARNING_DAYS", "3"))  # За сколько дней предупреждать об истечении
-AVAILABLE_DURATIONS = [3, 30, 180, 365]  # Доступные периоды в днях
+AVAILABLE_DURATIONS = [30, 90]  # Доступные периоды в днях
 CLEANUP_DAYS_KEEP = int(os.getenv("CLEANUP_DAYS_KEEP", "7"))  # Сколько дней хранить старые записи лимитов
 
 # Anti-bruteforce настройки
