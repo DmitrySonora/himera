@@ -46,21 +46,21 @@ DEEPSEEK_MODEL = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
 # === Auto (по умолчанию) ===
 TEMPERATURE = float(os.getenv("TEMPERATURE", "0.85"))
 TOP_P = float(os.getenv("TOP_P", "0.9"))
-MAX_TOKENS = int(os.getenv("MAX_TOKENS", "700"))
+MAX_TOKENS = int(os.getenv("MAX_TOKENS", "600"))
 FREQUENCY_PENALTY = float(os.getenv("FREQUENCY_PENALTY", "0.4"))
 PRESENCE_PENALTY = float(os.getenv("PRESENCE_PENALTY", "0.6"))
 
 # === Expert ===
 TEMPERATURE_EXPERT = float(os.getenv("TEMPERATURE_EXPERT", "0.45"))
 TOP_P_EXPERT = float(os.getenv("TOP_P_EXPERT", "0.85"))
-MAX_TOKENS_EXPERT = int(os.getenv("MAX_TOKENS_EXPERT", "500"))
+MAX_TOKENS_EXPERT = int(os.getenv("MAX_TOKENS_EXPERT", "400"))
 FREQUENCY_PENALTY_EXPERT = float(os.getenv("FREQUENCY_PENALTY_EXPERT", "0.65"))
 PRESENCE_PENALTY_EXPERT = float(os.getenv("PRESENCE_PENALTY_EXPERT", "0.6"))
 
 # === Writer ===
 TEMPERATURE_WRITER = float(os.getenv("TEMPERATURE_WRITER", "0.75"))
 TOP_P_WRITER = float(os.getenv("TOP_P_WRITER", "0.95"))
-MAX_TOKENS_WRITER = int(os.getenv("MAX_TOKENS_WRITER", "700"))
+MAX_TOKENS_WRITER = int(os.getenv("MAX_TOKENS_WRITER", "600"))
 FREQUENCY_PENALTY_WRITER = float(os.getenv("FREQUENCY_PENALTY_WRITER", "0.3"))
 PRESENCE_PENALTY_WRITER = float(os.getenv("PRESENCE_PENALTY_WRITER", "0.8"))
 
