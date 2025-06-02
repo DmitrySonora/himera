@@ -5,10 +5,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Telegram Bot Token
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "7404854015:AAEyJwp5vCtIgRRpQlxpfBTgZSxbGRJzYQU")
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 
 # DeepSeek API Key
-DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "sk-8e6d7a7e7acf4202b013251e1ebc2d2a")
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
 
 # DeepSeek Endpoint
 DEEPSEEK_API_URL = os.getenv("DEEPSEEK_API_URL", "https://api.deepseek.com/v1/chat/completions")
