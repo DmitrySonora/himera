@@ -141,7 +141,7 @@ async def check_auth_and_limits(update: Update, context: ContextTypes.DEFAULT_TY
         if remaining <= 3:  # Предупреждаем когда остается мало
             info_msg = f"⚠️ Осталось бесплатных сообщений сегодня: {remaining}"
             if remaining <= 3:
-                info_msg += "\n\nВведите пароль от своей подписки для снятия ограничений\nПодписку можно оформить здесь ☞ @aihimera"
+                info_msg += "\n\nПосле исчерпания лимита введите пароль от своей подписки и общайтесь без ограничений!\nПодписку можно оформить здесь ☞ @aihimera"
             await update.message.reply_text(info_msg)
         
         return True, None
